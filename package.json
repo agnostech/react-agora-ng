@@ -1,0 +1,13 @@
+{
+  "name": "react-agora",
+  "version": "1.0.0",
+  "description": "React Hooks for Agora NG SDK",
+  "main": "index.js",
+  "repository": "https://github.com/agnostech/react-agora-ng.git",
+  "author": "Agnostech Innovations LLP",
+  "license": "MIT",
+  "dependencies": {
+    "agora-rtc-sdk-ng": "^4.0.1",
+    "react": "^16.13.1"
+  }
+}
