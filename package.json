@@ -6,7 +6,7 @@
   "repository": "https://github.com/agnostech/react-agora-ng.git",
   "author": "Agnostech Innovations LLP",
   "license": "MIT",
-  "dependencies": {
+  "peerDependencies": {
     "agora-rtc-sdk-ng": "^4.0.1",
     "react": "^16.13.1"
   }
