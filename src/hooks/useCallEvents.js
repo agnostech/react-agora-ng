@@ -1,10 +1,12 @@
 import {useAgoraClient} from "./useAgoraClient";
 import {useEffect, useState} from "react";
+import {useScreenShareClient} from "./useScreenShareClient";
 
 export const useCallEvents = () => {
 
     const [events, setEvents] = useState({event: '', data: {}})
     const client = useAgoraClient();
+    const [screenShareClient] = useScreenShareClient();
 
     useEffect(() => {
 
@@ -21,13 +23,25 @@ export const useCallEvents = () => {
 
         // user events
         client.on("user-published", async (remoteUser, mediaType) => {
-            await client.subscribe(remoteUser, mediaType);
-            setEvents({
-                event: 'user-published', data: {
-                    remoteUser,
-                    mediaType
-                }
-            });
+            if (screenShareClient && screenShareClient.uid && (remoteUser.uid === screenShareClient.uid)) {
+                setEvents({
+                    event: 'user-published',
+                    data: {
+                        remoteUser,
+                        mediaType,
+                        isScreenShare: true
+                    }
+                })
+            } else {
+                await client.subscribe(remoteUser, mediaType);
+                setEvents({
+                    event: 'user-published', data: {
+                        remoteUser,
+                        mediaType,
+                        isScreenShare: false
+                    }
+                });
+            }
         });
 
         client.on('user-unpublished', (remoteUser, mediaType) => {
@@ -203,7 +217,7 @@ export const useCallEvents = () => {
         return () => {
             client.removeAllListeners();
         }
-    }, [client, setEvents]);
+    }, [client, setEvents, screenShareClient]);
 
     return {
         events

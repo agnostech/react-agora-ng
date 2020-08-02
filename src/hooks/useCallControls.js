@@ -1,10 +1,12 @@
 import {useAgoraClient} from "./useAgoraClient";
 import {useCallback} from "react";
 import AgoraRTC from 'agora-rtc-sdk-ng';
+import {useScreenShareClient} from "./useScreenShareClient";
 
 export const useCallControls = () => {
 
     const client = useAgoraClient();
+    const [screenShareClient, setScreenShareClient] = useScreenShareClient();
 
     const toggleVideo = useCallback(async (divId) => {
         const videoTrack = client.localTracks.filter(track => track.trackMediaType === "video");
@@ -54,13 +56,48 @@ export const useCallControls = () => {
         }
     }, [client]);
 
-    const leaveMeeting = async () => {
-        return client.leave();
-    }
+
+    const leaveMeeting = useCallback(async () => {
+        try {
+            await client.leave();
+        } catch (error) {
+            return error;
+        }
+    }, [client]);
+
+
+    const startScreenShare = useCallback(async (appId, channelId, token) => {
+        try {
+            const screenShareClient = AgoraRTC.createClient({mode: "rtc", codec: "vp8"});
+            await screenShareClient.join(appId, channelId, token);
+
+            const screenTrack = await AgoraRTC.createScreenVideoTrack();
+            await screenShareClient.publish(screenTrack);
+
+            setScreenShareClient(screenShareClient);
+
+        } catch (error) {
+            return error;
+        }
+
+    }, [setScreenShareClient]);
+
+    const stopScreenShare = useCallback(async () => {
+        try {
+            if (screenShareClient != null) {
+                await screenShareClient.leave();
+                setScreenShareClient(null);
+            }
+        } catch (error) {
+            return error;
+        }
+    }, [screenShareClient]);
 
     return {
         toggleAudio,
         toggleVideo,
-        leaveMeeting
+        leaveMeeting,
+        startScreenShare,
+        stopScreenShare
     };
 }

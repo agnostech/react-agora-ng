@@ -3,6 +3,7 @@ import {useAgoraClient} from "./useAgoraClient";
 import AgoraRTC from "agora-rtc-sdk-ng";
 
 export const useJoinCall = ({appId, channel, token, userId, localVideoDiv}) => {
+
     const [loading, setLoading] = useState(true);
     const [localUserId, setLocalUserId] = useState(null)
     const [error, setError] = useState(null);
