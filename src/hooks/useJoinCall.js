@@ -25,12 +25,19 @@ export const useJoinCall = ({appId, channel, token, userId, localVideoDiv}) => {
             try {
                 const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
                 audioTrack.play();
-                const videoTrack = await AgoraRTC.createCameraVideoTrack();
-                videoTrack.play(localVideoDiv)
-                await client.publish([audioTrack, videoTrack])
-                return true;
+                await client.publish(audioTrack);
             } catch (error) {
-                return error
+                //TODO: Report error when audio permissions are denied
+                return error;
+            }
+
+            try {
+                const videoTrack = await AgoraRTC.createCameraVideoTrack();
+                videoTrack.play(localVideoDiv);
+                await client.publish(videoTrack);
+            } catch (error) {
+                //TODO: Report error when video permissions are denied
+                return error;
             }
         }
 
