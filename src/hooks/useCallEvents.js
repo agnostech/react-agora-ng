@@ -9,7 +9,6 @@ export const useCallEvents = () => {
     useEffect(() => {
 
         client.on("user-published", async (remoteUser, mediaType) => {
-            console.log(mediaType);
             await client.subscribe(remoteUser, mediaType);
             setEvents({
                 event: 'user-published', data: {

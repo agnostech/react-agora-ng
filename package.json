@@ -1,13 +1,48 @@
 {
-  "name": "react-agora-ng",
+  "name": "@agnostech/react-agora-ng",
   "version": "1.0.0",
   "description": "React Hooks for Agora NG SDK",
-  "main": "index.js",
-  "repository": "https://github.com/agnostech/react-agora-ng.git",
+  "private": true,
+  "keywords": [
+    "agora",
+    "react",
+    "hooks",
+    "rtc",
+    "video",
+    "call",
+    "conferencing"
+  ],
+  "main": "dist/main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agnostech/react-agora-ng.git"
+  },
+  "bugs": {
+    "url": "https://github.com/agnostech/react-agora-ng/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/agnostech/react-agora-ng.git",
   "author": "Agnostech Innovations LLP",
   "license": "MIT",
+  "scripts": {
+    "build": "rollup -c"
+  },
   "peerDependencies": {
     "agora-rtc-sdk-ng": "^4.0.1",
     "react": "^16.13.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.0",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-react": "^7.10.4",
+    "@rollup/plugin-babel": "^5.1.0",
+    "@rollup/plugin-node-resolve": "^8.4.0",
+    "rollup": "^2.23.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
