@@ -1,6 +1,6 @@
 {
   "name": "@agnostech/react-agora-ng",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React Hooks for Agora NG SDK",
   "keywords": [
     "agora",
