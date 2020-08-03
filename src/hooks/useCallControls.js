@@ -57,7 +57,7 @@ export const useCallControls = () => {
     }, [client]);
 
 
-    const leaveMeeting = useCallback(async () => {
+    const leave = useCallback(async () => {
         try {
             await client.leave();
         } catch (error) {
@@ -104,7 +104,7 @@ export const useCallControls = () => {
     return {
         toggleAudio,
         toggleVideo,
-        leaveMeeting,
+        leave,
         startScreenShare,
         stopScreenShare
     };
