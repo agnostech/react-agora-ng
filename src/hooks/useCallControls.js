@@ -66,29 +66,37 @@ export const useCallControls = () => {
     }, [client]);
 
 
-    const startScreenShare = useCallback(async (appId, channelId, token) => {
-        try {
-            const screenShareClient = AgoraRTC.createClient({mode: "rtc", codec: "vp8"});
-            await screenShareClient.join(appId, channelId, token);
+    const startScreenShare = useCallback(async ({appId, channel, token}) => {
+        if (!screenShareClient) {
+            try {
+                const screenShareClient = AgoraRTC.createClient({mode: "rtc", codec: "vp8"});
+                await screenShareClient.join(appId, channel, token);
 
-            const screenTrack = await AgoraRTC.createScreenVideoTrack();
-            await screenShareClient.publish(screenTrack);
+                const screenTrack = await AgoraRTC.createScreenVideoTrack();
+                await screenShareClient.publish(screenTrack);
 
-            setScreenShareClient(screenShareClient);
+                setScreenShareClient(screenShareClient);
 
-        } catch (error) {
-            return error;
+            } catch (error) {
+                console.log(error);
+                return error;
+            }
         }
-
-    }, [setScreenShareClient]);
+    }, [setScreenShareClient, screenShareClient]);
 
     const stopScreenShare = useCallback(async () => {
         try {
-            if (screenShareClient != null) {
+            if (screenShareClient) {
+                const videoTrack = screenShareClient.localTracks;
+                if (videoTrack.length > 0) {
+                    videoTrack[0].stop();
+                    videoTrack[0].close();
+                }
                 await screenShareClient.leave();
                 setScreenShareClient(null);
             }
         } catch (error) {
+            console.log(error);
             return error;
         }
     }, [screenShareClient]);
