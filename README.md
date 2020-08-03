@@ -32,7 +32,7 @@ const client = AgoraRTC.createClient({mode: "rtc", codec: "vp8"});
 const Test = () => (  
   <AgoraProvider client={client}>  
 	 <App/>  
- </AgoraProvider>  
+  </AgoraProvider>  
 );  
   
 ReactDOM.render(  
@@ -59,13 +59,13 @@ const App = () => {
 	useEffect(() => {  
 	  switch (events.event) {  
 		  case "user-joined": 
-			  /* add the newly joined user to array of users. 
+			  /* add the newly joined user to the array of users. 
 			     here the event object is
 			     {
-				     event: 'user-joined',
-				     data: {
-						remoteUser: {...newly connected user object}
-					   }
+			     	event: 'user-joined',
+				data: {
+					remoteUser: {...newly connected user object}
+				      }
 			     }
 			  */
 			  setUsers(users => [...users, events.data.remoteUser]);
@@ -84,7 +84,7 @@ const App = () => {
 				  return users.filter(oldUser => oldUser.uid !== user.uid);  
 			  });  
 			  break;
-		  // check Agora docs for all the supported evebts.
+		  // check Agora docs for all the supported events.
 		}  
    }, [events, setUsers])
 }
@@ -103,7 +103,6 @@ return (
 
 export default App;
 ```
-**
 
 **`useCallEvents()`**
 
@@ -181,7 +180,7 @@ export default App;
 ```
 Calling `useJoinCall()` will 
 
- - join the mentioned channel
+ - connect the local user to the mentioned channel
  - ask the user for video and audio permissions
  - publish audio and video tracks on the channel
  - On successful connection, it returns the `uid` of the connected local user as `localUserId`, sets `loading` as `false` or returns an `error` if there was an issue in the process.
@@ -198,7 +197,7 @@ Calling `useJoinCall()` will
 
 **Returns**
 
- - `loading` - This represents the connection status. It is true by default. Once the connection is established, it becomes false. You can use this parameter to show a different UI before the connection is established.
+ - `loading` - This represents the connection status. It is `true` by default. Once the connection is established, it becomes `false`. You can use this parameter to show a different UI before the connection is established.
  - `localUserId` - The `uid` of the local user connected on the call.
  - `error` - If there is any error during the call joining process, it can be checked here.
 ---
@@ -279,7 +278,7 @@ export default App;
 
 **Returns**
 
- - `toggleVideo()` - To start/stop your video stream.
+ - `toggleVideo(localVideoDivId)` - To start/stop your video stream. You need to pass the `id` of the div to play the local user's video stream.
  - `toggleAudio()` - To start/stop your microphone audio stream.
  - `leave()` - To leave the call.
  - `startScreenShare({appId, channel, token})` - To start screen sharing.
