@@ -292,6 +292,9 @@ export default App;
 
 ## TODO
 
+ - [ ] Add example project
+ - [ ] Write tests
+ - [ ] CI/CD
  - [ ] Efficient error handling
  - [ ] Don't publish stream in live mode if the user role is not `host`
  - [ ] Implement RTM for sending messages during the calls

@@ -1,12 +1,14 @@
 import {useAgoraClient} from "./useAgoraClient";
-import {useCallback} from "react";
+import {useCallback, useContext} from "react";
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import {useScreenShareClient} from "./useScreenShareClient";
+import {AgoraContext} from "../context/AgoraContext";
 
 export const useCallControls = () => {
 
     const client = useAgoraClient();
     const [screenShareClient, setScreenShareClient] = useScreenShareClient();
+    const {appId} = useContext(AgoraContext);
 
     const toggleVideo = useCallback(async (divId) => {
         const videoTrack = client.localTracks.filter(track => track.trackMediaType === "video");
@@ -37,7 +39,6 @@ export const useCallControls = () => {
         if (audioTrack.length <= 0) {
             try {
                 const audio = await AgoraRTC.createMicrophoneAudioTrack();
-                audio.play();
                 await client.publish(audio);
             } catch (error) {
                 console.log(error);
@@ -45,14 +46,12 @@ export const useCallControls = () => {
             return;
         }
         const audio = audioTrack[0];
-        if (audio.isPlaying) {
-            audio.stop();
-            audio.close();
-            try {
-                await client.unpublish(audio);
-            } catch (error) {
-                console.log(error);
-            }
+        audio.stop();
+        audio.close();
+        try {
+            await client.unpublish(audio);
+        } catch (error) {
+            console.log(error);
         }
     }, [client]);
 
@@ -66,7 +65,7 @@ export const useCallControls = () => {
     }, [client]);
 
 
-    const startScreenShare = useCallback(async ({appId, channel, token}) => {
+    const startScreenShare = useCallback(async ({channel, token}) => {
         if (!screenShareClient) {
             try {
                 const screenShareClient = AgoraRTC.createClient({mode: "rtc", codec: "vp8"});
@@ -82,7 +81,7 @@ export const useCallControls = () => {
                 return error;
             }
         }
-    }, [setScreenShareClient, screenShareClient]);
+    }, [setScreenShareClient, screenShareClient, appId]);
 
     const stopScreenShare = useCallback(async () => {
         try {

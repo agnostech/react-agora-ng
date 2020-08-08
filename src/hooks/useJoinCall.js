@@ -1,14 +1,16 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useContext} from 'react';
 import {useAgoraClient} from "./useAgoraClient";
 import AgoraRTC from "agora-rtc-sdk-ng";
+import {AgoraContext} from "../context/AgoraContext";
 
-export const useJoinCall = ({appId, channel, token, userId, localVideoDiv}) => {
+export const useJoinCall = ({channel, token, userId, localVideoDiv}) => {
 
     const [loading, setLoading] = useState(true);
     const [localUserId, setLocalUserId] = useState(null)
     const [error, setError] = useState(null);
     const [retry, setRetry] = useState(false);
     const client = useAgoraClient()
+    const {appId} = useContext(AgoraContext);
 
     useEffect(() => {
 
@@ -25,7 +27,6 @@ export const useJoinCall = ({appId, channel, token, userId, localVideoDiv}) => {
         async function publishTracks() {
             try {
                 const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-                audioTrack.play();
                 await client.publish(audioTrack);
             } catch (error) {
                 //TODO: Report error when audio permissions are denied
