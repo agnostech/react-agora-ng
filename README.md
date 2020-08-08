@@ -17,7 +17,7 @@ or
 4. Call `useCallControls()` to start/stop audio/video, leave the call or share your screen. 
 
 ## Usage
-**1. Initialize `AgoraRTC` client and pass it to `AgoraProvider`**
+**1. Initialize `AgoraRTC` client and pass it to `AgoraProvider` along with `appId` which is available in your Agora dashboard**
 ```jsx
 import React from 'react';  
 import ReactDOM from 'react-dom';
@@ -30,7 +30,7 @@ import AgoraRTC from "agora-rtc-sdk-ng"
 const client = AgoraRTC.createClient({mode: "rtc", codec: "vp8"});  
 
 const Test = () => (  
-  <AgoraProvider client={client}>  
+  <AgoraProvider client={client} appId={'<YOUR_APP_ID>'}>  
 	 <App/>  
   </AgoraProvider>  
 );  
@@ -94,7 +94,8 @@ return (
 		<div style={{height: '40%'}}>  
 		  {users.map(user => (  
 			  <div key={user.uid.toString()} style={{height: '300px', width: '300px'}} id={user.uid.toString()}>  
-				  {user.videoTrack && user.videoTrack.play(user.uid.toString())}  
+				  {user.videoTrack && user.videoTrack.play(user.uid.toString())}
+				  {user.audioTrack && user.audioTrack.play()}
 			  </div>  
 		  ))}  
 	  </div>  
@@ -131,7 +132,6 @@ const App = () => {
 	
 	// join the call
 	const {loading, error, localUserId} = useJoinCall({
-		appId: 'ec49e3726eb949b99822fd0e8413e648',  
 		channel: 'lmpvc',  
 		userId: null,  
 		token: null,  
@@ -169,7 +169,8 @@ return (
 		 <div style={{height: '40%'}}>  
 		  {users.map(user => (  
 			  <div key={user.uid.toString()} style={{height: '300px', width: '300px'}} id={user.uid.toString()}>  
-				  {user.videoTrack && user.videoTrack.play(user.uid.toString())}  
+				  {user.videoTrack && user.videoTrack.play(user.uid.toString())}
+				  {user.audioTrack && user.audioTrack.play()}
 			  </div>  
 		  ))}  
 	  </div>  
@@ -185,11 +186,10 @@ Calling `useJoinCall()` will
  - publish audio and video tracks on the channel
  - On successful connection, it returns the `uid` of the connected local user as `localUserId`, sets `loading` as `false` or returns an `error` if there was an issue in the process.
  
- **`useJoinCall({appId, channel, token, userId, localVideoDiv})`**
+ **`useJoinCall({channel, token, userId, localVideoDiv})`**
  
  **Parameters:**
  
- - `appId (required)` - you can find this in your agora dashboard. This is used to communicate with your account.
  - `channel (required)` -  channel name of the call
  - `token` - required if authentication is enabled.
  - `userId` - A unique id for the current user. If sent as `null`, Agora will generate a unique `uid` for this user.
@@ -215,7 +215,6 @@ const App = () => {
 	
 	// join the call
 	const {loading, error, localUserId} = useJoinCall({
-		appId: 'ec49e3726eb949b99822fd0e8413e648',  
 		channel: 'lmpvc',  
 		userId: null,  
 		token: null,  
@@ -255,8 +254,7 @@ return (
 	 <button onClick={() => toggleVideo('test')}>toggle video</button>  
 	 <button onClick={() => toggleAudio()}>toggle audio</button>  
 	 <button onClick={() => leave()}>leave meeting</button>  
-	 <button onClick={() => startScreenShare({  
-		 appId: 'ec49e3726eb949b99822fd0e8413e648',  
+	 <button onClick={() => startScreenShare({
 		 channel: 'lmpvc',  
 		 token: null,  
 	 })}>start screen share</button>  
@@ -265,7 +263,8 @@ return (
 	 <div style={{height: '40%'}}>  
 		  {users.map(user => (  
 			  <div key={user.uid.toString()} style={{height: '300px', width: '300px'}} id={user.uid.toString()}>  
-				  {user.videoTrack && user.videoTrack.play(user.uid.toString())}  
+				  {user.videoTrack && user.videoTrack.play(user.uid.toString())}
+				  {user.audioTrack && user.audioTrack.play()}
 			  </div>  
 		  ))}  
 	 </div>  
@@ -281,8 +280,7 @@ export default App;
  - `toggleVideo(localVideoDivId)` - To start/stop your video stream. You need to pass the `id` of the div to play the local user's video stream.
  - `toggleAudio()` - To start/stop your microphone audio stream.
  - `leave()` - To leave the call.
- - `startScreenShare({appId, channel, token})` - To start screen sharing.
-	 -  `appId (required)` - you can find this in your agora dashboard. This is used to communicate with your account.
+ - `startScreenShare({channel, token})` - To start screen sharing.
 	 - `channel (required)` -  channel name of the call
 	 - `token` - required if authentication is enabled.
  - `stopScreeShare()` - To stop screen sharing.
