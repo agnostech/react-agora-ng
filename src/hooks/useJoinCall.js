@@ -1,50 +1,62 @@
 import {useEffect, useState, useContext, useCallback} from 'react';
 import {useAgoraClient} from "./useAgoraClient";
+import {useRTMClient} from "./useRTMClient";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import {AgoraContext} from "../context/AgoraContext";
 
 export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy}) => {
 
     const [loading, setLoading] = useState(true);
-    const [localUserId, setLocalUserId] = useState(null)
+    const [localUserId, setLocalUserId] = useState(null);
     const [error, setError] = useState(null);
     const [retry, setRetry] = useState(false);
-    const client = useAgoraClient()
-    const {appId} = useContext(AgoraContext);
+    const rtcClient = useAgoraClient();
+    const rtmClient = useRTMClient();
+    const {appId, setRTMChannel} = useContext(AgoraContext);
 
     const joinCall = useCallback(async () => {
         try {
-            client.setClientRole(isHost ? 'host' : 'audience');
-            const uid = await client.join(appId, channel, token, userId);
+            rtcClient.setClientRole(isHost ? 'host' : 'audience');
+            const uid = await rtcClient.join(appId, channel, token, userId);
             setLocalUserId(uid);
-            return true;
         } catch (error) {
-            return error
+            console.log(error);
         }
-    }, [client, appId, channel, token, userId, isHost, setLocalUserId]);
+
+        try {
+            if (rtmClient) {
+                await rtmClient.login({token, uid});
+                const rtmChannel = rtmClient.createChannel(channel);
+                await rtmChannel.join();
+                setRTMChannel(rtmChannel);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }, [rtcClient, rtmClient, appId, channel, token, userId, isHost, setLocalUserId]);
 
     const publishTracks = useCallback(async () => {
-            try {
-                if (isHost) {
-                    const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-                    await client.publish(audioTrack);
-                }
-            } catch (error) {
-                //TODO: Report error when audio permissions are denied
-                return error;
+        try {
+            if (isHost) {
+                const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                await rtcClient.publish(audioTrack);
             }
+        } catch (error) {
+            //TODO: Report error when audio permissions are denied
+            console.log(error);
+        }
 
-            try {
-                const videoTrack = await AgoraRTC.createCameraVideoTrack();
-                videoTrack.play(localVideoDiv);
-                if (isHost) {
-                    await client.publish(videoTrack);
-                }
-            } catch (error) {
-                //TODO: Report error when video permissions are denied
-                return error;
+        try {
+            const videoTrack = await AgoraRTC.createCameraVideoTrack();
+            videoTrack.play(localVideoDiv);
+            if (isHost) {
+                await rtcClient.publish(videoTrack);
             }
-    }, [isHost, client]);
+        } catch (error) {
+            //TODO: Report error when video permissions are denied
+            console.log(error);
+        }
+    }, [isHost, rtcClient]);
 
     const startCallAndStream = useCallback(() => {
         joinCall()
@@ -78,6 +90,6 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy
         error,
         localUserId,
         retryConnect,
-        startCallAndStream
+        startCall: startCallAndStream
     };
 }
