@@ -1,9 +1,9 @@
-import {useEffect, useState, useContext} from 'react';
+import {useEffect, useState, useContext, useCallback} from 'react';
 import {useAgoraClient} from "./useAgoraClient";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import {AgoraContext} from "../context/AgoraContext";
 
-export const useJoinCall = ({channel, token, userId, localVideoDiv}) => {
+export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy}) => {
 
     const [loading, setLoading] = useState(true);
     const [localUserId, setLocalUserId] = useState(null)
@@ -12,22 +12,23 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv}) => {
     const client = useAgoraClient()
     const {appId} = useContext(AgoraContext);
 
-    useEffect(() => {
-
-        async function joinCall() {
-            try {
-                const uid = await client.join(appId, channel, token, userId);
-                setLocalUserId(uid);
-                return true;
-            } catch (error) {
-                return error
-            }
+    const joinCall = useCallback(async () => {
+        try {
+            client.setClientRole(isHost ? 'host' : 'audience');
+            const uid = await client.join(appId, channel, token, userId);
+            setLocalUserId(uid);
+            return true;
+        } catch (error) {
+            return error
         }
+    }, [client, appId, channel, token, userId, isHost, setLocalUserId]);
 
-        async function publishTracks() {
+    const publishTracks = useCallback(async () => {
             try {
-                const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-                await client.publish(audioTrack);
+                if (isHost) {
+                    const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                    await client.publish(audioTrack);
+                }
             } catch (error) {
                 //TODO: Report error when audio permissions are denied
                 return error;
@@ -36,13 +37,16 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv}) => {
             try {
                 const videoTrack = await AgoraRTC.createCameraVideoTrack();
                 videoTrack.play(localVideoDiv);
-                await client.publish(videoTrack);
+                if (isHost) {
+                    await client.publish(videoTrack);
+                }
             } catch (error) {
                 //TODO: Report error when video permissions are denied
                 return error;
             }
-        }
+    }, [isHost, client]);
 
+    const startCallAndStream = useCallback(() => {
         joinCall()
             .then(() => publishTracks())
             .then(() => setLoading(false))
@@ -50,8 +54,20 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv}) => {
                 setLoading(false);
                 setError(error)
             });
+    }, [joinCall, publishTracks, setLoading, setError]);
 
-    }, [client, appId, channel, token, userId, localVideoDiv, setLoading, setLocalUserId, setError, retry])
+    useEffect(() => {
+        if (!lazy) {
+            joinCall()
+                .then(() => publishTracks())
+                .then(() => setLoading(false))
+                .catch(error => {
+                    setLoading(false);
+                    setError(error)
+                });
+        }
+
+    }, [joinCall, publishTracks, setLoading, setError, lazy]);
 
     const retryConnect = () => {
         setRetry(retry => !retry);
@@ -61,6 +77,7 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv}) => {
         loading,
         error,
         localUserId,
-        retryConnect
+        retryConnect,
+        startCallAndStream
     };
 }
