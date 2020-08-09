@@ -8,5 +8,5 @@ export default {
         format: 'cjs',
     },
     plugins: [nodeResolve(), babel({exclude: 'node_modules/**', babelHelpers: "bundled"})],
-    external: ['react', 'agora-rtc-sdk-ng']
+    external: ['react', 'agora-rtc-sdk-ng', 'agora-rtm-sdk']
 }

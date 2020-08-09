@@ -1,9 +1,11 @@
-import {useCallback} from 'react';
+import {useCallback, useContext} from 'react';
 import {useRTMClient} from "./useRTMClient";
+import {AgoraContext} from "../context/AgoraContext";
 
 export const useRTMControls = () => {
 
     const rtmClient = useRTMClient();
+    const {rtmChannel} = useContext(AgoraContext);
 
     const toggleAttendeeAudio = useCallback(async (userId) => {
         try {
@@ -50,11 +52,17 @@ export const useRTMControls = () => {
         }
     }, [rtmClient]);
 
+    const leave = useCallback(async () => {
+        await rtmChannel.leave();
+        await rtmClient.logout();
+    }, [rtmChannel, rtmClient]);
+
     return {
         toggleAttendeeVideo,
         toggleAttendeeAudio,
         toggleAttendeeScreenShare,
-        removeAttendee
+        removeAttendee,
+        leave
     }
 
 }

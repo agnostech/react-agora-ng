@@ -3,12 +3,16 @@ import {useCallback, useContext} from "react";
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import {useScreenShareClient} from "./useScreenShareClient";
 import {AgoraContext} from "../context/AgoraContext";
+import {useRTMControls} from "./useRTMControls";
+import {useRTMClient} from "./useRTMClient";
 
 export const useCallControls = () => {
 
     const client = useAgoraClient();
+    const rtmClient = useRTMClient();
     const [screenShareClient, setScreenShareClient] = useScreenShareClient();
     const {appId} = useContext(AgoraContext);
+    const {leave: leaveRTM} = useRTMControls();
 
     const toggleVideo = useCallback(async (divId) => {
         const videoTrack = client.localTracks.filter(track => track.trackMediaType === "video");
@@ -56,13 +60,16 @@ export const useCallControls = () => {
     }, [client]);
 
 
-    const leave = useCallback(async () => {
+    const leaveCall = useCallback(async () => {
         try {
+            if (rtmClient)
+                await leaveRTM();
             await client.leave();
         } catch (error) {
+            console.log(error);
             return error;
         }
-    }, [client]);
+    }, [client, rtmClient, leaveRTM]);
 
 
     const startScreenShare = useCallback(async ({channel, token}) => {
@@ -103,7 +110,7 @@ export const useCallControls = () => {
     return {
         toggleAudio,
         toggleVideo,
-        leave,
+        leaveCall,
         startScreenShare,
         stopScreenShare
     };

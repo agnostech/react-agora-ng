@@ -101,7 +101,7 @@ export const useRTMEvents = () => {
                 rtmClient.removeAllListeners();
         }
 
-    }, [setEvent, rtmClient]);
+    }, [setEvent, rtmClient, rtmChannel]);
 
     return {
         events

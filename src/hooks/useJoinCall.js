@@ -19,21 +19,15 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy
             rtcClient.setClientRole(isHost ? 'host' : 'audience');
             const uid = await rtcClient.join(appId, channel, token, userId);
             setLocalUserId(uid);
+            rtcClient.enableAudioVolumeIndicator();
+            await rtmClient.login({token, uid: `${uid}`});
+            const rtmChannel = rtmClient.createChannel(channel);
+            await rtmChannel.join();
+            setRTMChannel(rtmChannel);
         } catch (error) {
             console.log(error);
         }
-
-        try {
-            if (rtmClient) {
-                await rtmClient.login({token, uid});
-                const rtmChannel = rtmClient.createChannel(channel);
-                await rtmChannel.join();
-                setRTMChannel(rtmChannel);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }, [rtcClient, rtmClient, appId, channel, token, userId, isHost, setLocalUserId]);
+    }, [rtcClient, rtmClient, appId, channel, token, userId, isHost, setLocalUserId, setRTMChannel]);
 
     const publishTracks = useCallback(async () => {
         try {
