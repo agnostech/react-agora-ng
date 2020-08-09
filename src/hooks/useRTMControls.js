@@ -11,9 +11,9 @@ export const useRTMControls = () => {
         try {
             return await rtmClient.sendMessageToPeer({
                 text: 'mute-audio-toggle',
-                userId
-            });
+            },  userId);
         } catch (error) {
+            console.log(error);
             return error;
         }
 
@@ -23,8 +23,7 @@ export const useRTMControls = () => {
         try {
             return await rtmClient.sendMessageToPeer({
                 text: 'mute-video-toggle',
-                userId
-            });
+            }, userId);
         } catch (error) {
             return error;
         }
@@ -34,19 +33,18 @@ export const useRTMControls = () => {
         try {
             return await rtmClient.sendMessageToPeer({
                 text: 'remove-attendee',
-                userId
-            });
+            }, userId);
         } catch (error) {
+            console.log(error);
             return error;
         }
     }, [rtmClient]);
 
-    const toggleAttendeeScreenShare = useCallback(async () => {
+    const stopAttendeeScreenShare = useCallback(async (userId) => {
         try {
             return await rtmClient.sendMessageToPeer({
-                text: 'toggle-screen-share',
-                userId
-            });
+                text: 'stop-screen-share',
+            }, userId);
         } catch (error) {
             return error;
         }
@@ -60,7 +58,7 @@ export const useRTMControls = () => {
     return {
         toggleAttendeeVideo,
         toggleAttendeeAudio,
-        toggleAttendeeScreenShare,
+        stopAttendeeScreenShare,
         removeAttendee,
         leave
     }

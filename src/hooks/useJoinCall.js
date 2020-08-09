@@ -12,7 +12,7 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy
     const [retry, setRetry] = useState(false);
     const rtcClient = useAgoraClient();
     const rtmClient = useRTMClient();
-    const {appId, setRTMChannel} = useContext(AgoraContext);
+    const {appId, setRTMChannel, setLocalVideoDiv} = useContext(AgoraContext);
 
     const joinCall = useCallback(async () => {
         try {
@@ -43,6 +43,7 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy
         try {
             const videoTrack = await AgoraRTC.createCameraVideoTrack();
             videoTrack.play(localVideoDiv);
+            setLocalVideoDiv(localVideoDiv);
             if (isHost) {
                 await rtcClient.publish(videoTrack);
             }
@@ -50,7 +51,7 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy
             //TODO: Report error when video permissions are denied
             console.log(error);
         }
-    }, [isHost, rtcClient]);
+    }, [isHost, rtcClient, localVideoDiv, setLocalVideoDiv]);
 
     const startCallAndStream = useCallback(() => {
         joinCall()

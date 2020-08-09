@@ -1,10 +1,12 @@
 import {useState, useEffect, useContext} from 'react';
 import {AgoraContext} from '../context/AgoraContext';
+import {useCallControls} from "./useCallControls";
 
 export const useRTMEvents = () => {
 
     const [events, setEvent] = useState({event: '', data: {}});
     const {rtmChannel, rtmClient} = useContext(AgoraContext);
+    const {toggleVideo, toggleAudio, stopScreenShare, leaveCall} = useCallControls()
 
     useEffect(() => {
 
@@ -58,13 +60,28 @@ export const useRTMEvents = () => {
 
         if (rtmClient) {
             rtmClient.on('MessageFromPeer', (message, peerId) => {
-                setEvent({
-                    event: 'MessageFromPeer',
-                    data: {
-                        message,
-                        peerId
-                    }
-                });
+                switch (message.text) {
+                    case 'mute-audio-toggle':
+                        toggleAudio();
+                        break;
+                    case 'mute-video-toggle':
+                        toggleVideo();
+                        break;
+                    case 'remove-attendee':
+                        leaveCall();
+                        break;
+                    case 'stop-screen-share':
+                        stopScreenShare();
+                        break;
+                    default:
+                        setEvent({
+                            event: 'MessageFromPeer',
+                            data: {
+                                message,
+                                peerId
+                            }
+                        });
+                }
             });
 
             rtmClient.on('ConnectionStateChanged', (newState, reason) => {
@@ -97,11 +114,12 @@ export const useRTMEvents = () => {
         return () => {
             if (rtmChannel)
                 rtmChannel.removeAllListeners();
-            if (rtmChannel)
+
+            if (rtmClient)
                 rtmClient.removeAllListeners();
         }
 
-    }, [setEvent, rtmClient, rtmChannel]);
+    }, [setEvent, rtmClient, rtmChannel, toggleAudio, toggleVideo, leaveCall, stopScreenShare]);
 
     return {
         events

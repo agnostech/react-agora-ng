@@ -6,7 +6,8 @@ export const AgoraProvider = ({client, appId, enableRTM, children}) => {
 
     const [screenShareClient, setScreenShareClient] = useState(null);
     const [rtmChannel, setRTMChannel] = useState(null);
-    const [rtmClient, setRTMClient] = useState(null)
+    const [rtmClient, setRTMClient] = useState(null);
+    const [localVideoDiv, setLocalVideoDiv] = useState('');
 
     useEffect(() => {
         if (enableRTM) {
@@ -24,7 +25,9 @@ export const AgoraProvider = ({client, appId, enableRTM, children}) => {
                 appId,
                 rtmClient,
                 rtmChannel,
-                setRTMChannel
+                setRTMChannel,
+                localVideoDiv,
+                setLocalVideoDiv
             }}>
             {children}
         </AgoraContext.Provider>

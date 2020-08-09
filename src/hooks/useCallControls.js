@@ -11,15 +11,16 @@ export const useCallControls = () => {
     const client = useAgoraClient();
     const rtmClient = useRTMClient();
     const [screenShareClient, setScreenShareClient] = useScreenShareClient();
-    const {appId} = useContext(AgoraContext);
+    const {appId, localVideoDiv, setLocalVideoDiv} = useContext(AgoraContext);
+
     const {leave: leaveRTM} = useRTMControls();
 
-    const toggleVideo = useCallback(async (divId) => {
+    const toggleVideo = useCallback(async () => {
         const videoTrack = client.localTracks.filter(track => track.trackMediaType === "video");
         if (videoTrack.length <= 0) {
             try {
                 const video = await AgoraRTC.createCameraVideoTrack();
-                video.play(divId);
+                video.play(localVideoDiv);
                 await client.publish(video);
             } catch (error) {
                 console.log(error);
@@ -36,7 +37,7 @@ export const useCallControls = () => {
                 console.log(error);
             }
         }
-    }, [client])
+    }, [client, localVideoDiv])
 
     const toggleAudio = useCallback(async () => {
         const audioTrack = client.localTracks.filter(track => track.trackMediaType === "audio");
@@ -107,11 +108,16 @@ export const useCallControls = () => {
         }
     }, [screenShareClient]);
 
+    const setLocalDivId = useCallback((id) => {
+        setLocalVideoDiv(id)
+    }, [setLocalVideoDiv]);
+
     return {
         toggleAudio,
         toggleVideo,
         leaveCall,
         startScreenShare,
-        stopScreenShare
+        stopScreenShare,
+        setLocalDivId
     };
 }
