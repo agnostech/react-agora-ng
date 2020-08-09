@@ -297,3 +297,4 @@ export default App;
  - [x] Don't publish stream in live mode if the user role is not `host`
  - [x] Implement RTM for sending messages during the calls
  - [ ] Implement call invitations
+ - [x] Add option to send a message to peers

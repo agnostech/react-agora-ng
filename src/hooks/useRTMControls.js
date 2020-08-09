@@ -11,7 +11,7 @@ export const useRTMControls = () => {
         try {
             return await rtmClient.sendMessageToPeer({
                 text: 'mute-audio-toggle',
-            },  userId);
+            }, userId);
         } catch (error) {
             console.log(error);
             return error;
@@ -55,11 +55,31 @@ export const useRTMControls = () => {
         await rtmClient.logout();
     }, [rtmChannel, rtmClient]);
 
+    const sendChannelMessage = useCallback(async (text) => {
+        try {
+            await rtmChannel.sendMessage({text})
+        } catch (error) {
+            return error;
+        }
+    }, [rtmChannel]);
+
+    const sendPeerMessage = useCallback(async (text, uid) => {
+        try {
+            return await rtmClient.sendMessageToPeer({
+                text
+            }, uid);
+        } catch (error) {
+            return error;
+        }
+    }, [rtmClient])
+
     return {
         toggleAttendeeVideo,
         toggleAttendeeAudio,
         stopAttendeeScreenShare,
         removeAttendee,
+        sendChannelMessage,
+        sendPeerMessage,
         leave
     }
 
