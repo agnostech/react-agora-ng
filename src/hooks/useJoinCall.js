@@ -11,12 +11,15 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy
     const [error, setError] = useState(null);
     const [retry, setRetry] = useState(false);
     const rtcClient = useAgoraClient();
-    const rtmClient = useRTMClient();
-    const {appId, setRTMChannel, setLocalVideoDiv} = useContext(AgoraContext);
+    const {appId, setRTMChannel, setLocalVideoDiv, rtmClient} = useContext(AgoraContext);
 
     const joinCall = useCallback(async () => {
         try {
-            rtcClient.setClientRole(isHost ? 'host' : 'audience');
+            try {
+                await rtcClient.setClientRole(isHost ? 'host' : 'audience');
+            } catch (error) {
+
+            }
             const uid = await rtcClient.join(appId, channel, token, userId);
             setLocalUserId(uid);
             rtcClient.enableAudioVolumeIndicator();
