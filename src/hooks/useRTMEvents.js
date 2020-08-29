@@ -9,7 +9,6 @@ export const useRTMEvents = () => {
     const {toggleVideo, toggleAudio, stopScreenShare, leaveCall} = useCallControls()
 
     useEffect(() => {
-
         if (rtmChannel) {
             rtmChannel.on('ChannelMessage', function (message, memberId) {
                 setEvent({

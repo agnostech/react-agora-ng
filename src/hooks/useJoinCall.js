@@ -4,7 +4,7 @@ import {useRTMClient} from "./useRTMClient";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import {AgoraContext} from "../context/AgoraContext";
 
-export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy}) => {
+export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy, mode}) => {
 
     const [loading, setLoading] = useState(true);
     const [localUserId, setLocalUserId] = useState(null);
@@ -15,10 +15,8 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy
 
     const joinCall = useCallback(async () => {
         try {
-            try {
-                await rtcClient.setClientRole(isHost ? 'host' : 'audience');
-            } catch (error) {
-
+            if (isHost) {
+                await rtcClient.setClientRole('host');
             }
             const uid = await rtcClient.join(appId, channel, token, userId);
             setLocalUserId(uid);
@@ -34,7 +32,12 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy
 
     const publishTracks = useCallback(async () => {
         try {
-            if (isHost) {
+            if (mode === 'live') {
+                if (isHost) {
+                    const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                    await rtcClient.publish(audioTrack);
+                }
+            } else {
                 const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
                 await rtcClient.publish(audioTrack);
             }
@@ -47,7 +50,11 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy
             const videoTrack = await AgoraRTC.createCameraVideoTrack();
             videoTrack.play(localVideoDiv);
             setLocalVideoDiv(localVideoDiv);
-            if (isHost) {
+            if (mode === 'live') {
+                if (isHost) {
+                    await rtcClient.publish(videoTrack);
+                }
+            } else {
                 await rtcClient.publish(videoTrack);
             }
         } catch (error) {

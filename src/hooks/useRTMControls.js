@@ -51,8 +51,8 @@ export const useRTMControls = () => {
     }, [rtmClient]);
 
     const leave = useCallback(async () => {
-        await rtmChannel.leave();
-        await rtmClient.logout();
+        await rtmChannel && rtmChannel.leave();
+        await rtmClient && rtmClient.logout();
     }, [rtmChannel, rtmClient]);
 
     const sendChannelMessage = useCallback(async (text) => {
