@@ -23,8 +23,8 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy
             rtcClient.enableAudioVolumeIndicator();
             await rtmClient.login({token, uid: `${uid}`});
             const rtmChannel = rtmClient.createChannel(channel);
-            await rtmChannel.join();
             setRTMChannel(rtmChannel);
+            await rtmChannel.join();
         } catch (error) {
             console.log(error);
         }
@@ -65,7 +65,10 @@ export const useJoinCall = ({channel, token, userId, localVideoDiv, isHost, lazy
 
     const startCallAndStream = useCallback(() => {
         joinCall()
-            .then(() => publishTracks())
+            .then(() => {
+                console.log("then k andar hu")
+                publishTracks()
+            })
             .then(() => setLoading(false))
             .catch(error => {
                 setLoading(false);
