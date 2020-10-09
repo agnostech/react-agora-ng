@@ -71,10 +71,8 @@ export const useCallControls = () => {
             audio.close();
             const videoTrack = client.localTracks.filter(track => track.trackMediaType === "video");
             const video = videoTrack[0];
-            if (video.isPlaying) {
-                video.stop();
-                video.close();
-            }
+            video.stop();
+            video.close();
             await client.leave();
         } catch (error) {
             console.log(error);
