@@ -67,12 +67,16 @@ export const useCallControls = () => {
                 await leaveRTM();
             const audioTrack = client.localTracks.filter(track => track.trackMediaType === "audio");
             const audio = audioTrack[0];
-            audio.stop();
-            audio.close();
+            if (audio) {
+                audio.stop();
+                audio.close();
+            }
             const videoTrack = client.localTracks.filter(track => track.trackMediaType === "video");
             const video = videoTrack[0];
-            video.stop();
-            video.close();
+            if (video) {
+                video.stop();
+                video.close();
+            }
             await client.leave();
         } catch (error) {
             console.log(error);
