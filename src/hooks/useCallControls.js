@@ -1,5 +1,5 @@
 import {useAgoraClient} from "./useAgoraClient";
-import {useCallback, useContext} from "react";
+import {useCallback, useContext, useState} from "react";
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import {useScreenShareClient} from "./useScreenShareClient";
 import {AgoraContext} from "../context/AgoraContext";
@@ -12,6 +12,8 @@ export const useCallControls = () => {
     const rtmClient = useRTMClient();
     const [screenShareClient, setScreenShareClient] = useScreenShareClient();
     const {appId, localVideoDiv, setLocalVideoDiv} = useContext(AgoraContext);
+    const [isAudioMute, setAudioMute] = useState(false);
+    const [isVideoMute, setVideoMute] = useState(false);
 
     const {leave: leaveRTM} = useRTMControls();
 
@@ -22,6 +24,7 @@ export const useCallControls = () => {
                 const video = await AgoraRTC.createCameraVideoTrack();
                 video.play(localVideoDiv);
                 await client.publish(video);
+                setVideoMute(false);
             } catch (error) {
                 console.log(error);
             }
@@ -33,6 +36,7 @@ export const useCallControls = () => {
             video.close();
             try {
                 await client.unpublish(video);
+                setVideoMute(true);
             } catch (error) {
                 console.log(error);
             }
@@ -45,6 +49,7 @@ export const useCallControls = () => {
             try {
                 const audio = await AgoraRTC.createMicrophoneAudioTrack();
                 await client.publish(audio);
+                setAudioMute(false);
             } catch (error) {
                 console.log(error);
             }
@@ -54,7 +59,9 @@ export const useCallControls = () => {
         audio.stop();
         audio.close();
         try {
+
             await client.unpublish(audio);
+            setAudioMute(true);
         } catch (error) {
             console.log(error);
         }
@@ -133,6 +140,8 @@ export const useCallControls = () => {
         toggleAudio,
         toggleVideo,
         leaveCall,
+        isAudioMute,
+        isVideoMute,
         startScreenShare,
         stopScreenShare,
         setLocalDivId
