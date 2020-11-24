@@ -14,6 +14,7 @@ export const useCallControls = () => {
     const {appId, localVideoDiv, setLocalVideoDiv} = useContext(AgoraContext);
     const [isAudioMute, setAudioMute] = useState(false);
     const [isVideoMute, setVideoMute] = useState(false);
+    const [isScreenSharing, setScreenShare] = useState(false);
 
     const {leave: leaveRTM} = useRTMControls();
 
@@ -105,7 +106,7 @@ export const useCallControls = () => {
                     }
                 });
                 await screenShareClient.publish(screenTrack);
-
+                setScreenShare(true);
                 setScreenShareClient(screenShareClient);
 
             } catch (error) {
@@ -124,6 +125,7 @@ export const useCallControls = () => {
                     videoTrack[0].close();
                 }
                 await screenShareClient.leave();
+                setScreenShare(false);
                 setScreenShareClient(null);
             }
         } catch (error) {
@@ -142,6 +144,7 @@ export const useCallControls = () => {
         leaveCall,
         isAudioMute,
         isVideoMute,
+        isScreenSharing,
         startScreenShare,
         stopScreenShare,
         setLocalDivId
