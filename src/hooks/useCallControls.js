@@ -12,9 +12,6 @@ export const useCallControls = () => {
     const rtmClient = useRTMClient();
     const [screenShareClient, setScreenShareClient] = useScreenShareClient();
     const {appId, localVideoDiv, setLocalVideoDiv} = useContext(AgoraContext);
-    const [isAudioMute, setAudioMute] = useState(false);
-    const [isVideoMute, setVideoMute] = useState(false);
-    const [isScreenSharing, setScreenShare] = useState(false);
 
     const {leave: leaveRTM} = useRTMControls();
 
@@ -25,7 +22,6 @@ export const useCallControls = () => {
                 const video = await AgoraRTC.createCameraVideoTrack();
                 video.play(localVideoDiv);
                 await client.publish(video);
-                setVideoMute(false);
             } catch (error) {
                 console.log(error);
             }
@@ -37,7 +33,6 @@ export const useCallControls = () => {
             video.close();
             try {
                 await client.unpublish(video);
-                setVideoMute(true);
             } catch (error) {
                 console.log(error);
             }
@@ -50,7 +45,6 @@ export const useCallControls = () => {
             try {
                 const audio = await AgoraRTC.createMicrophoneAudioTrack();
                 await client.publish(audio);
-                setAudioMute(false);
             } catch (error) {
                 console.log(error);
             }
@@ -62,7 +56,6 @@ export const useCallControls = () => {
         try {
 
             await client.unpublish(audio);
-            setAudioMute(true);
         } catch (error) {
             console.log(error);
         }
@@ -106,7 +99,6 @@ export const useCallControls = () => {
                     }
                 });
                 await screenShareClient.publish(screenTrack);
-                setScreenShare(true);
                 setScreenShareClient(screenShareClient);
 
             } catch (error) {
@@ -125,7 +117,6 @@ export const useCallControls = () => {
                     videoTrack[0].close();
                 }
                 await screenShareClient.leave();
-                setScreenShare(false);
                 setScreenShareClient(null);
             }
         } catch (error) {
@@ -142,9 +133,6 @@ export const useCallControls = () => {
         toggleAudio,
         toggleVideo,
         leaveCall,
-        isAudioMute,
-        isVideoMute,
-        isScreenSharing,
         startScreenShare,
         stopScreenShare,
         setLocalDivId

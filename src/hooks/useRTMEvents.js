@@ -72,15 +72,14 @@ export const useRTMEvents = () => {
                     case 'stop-screen-share':
                         stopScreenShare();
                         break;
-                    default:
-                        setEvent({
-                            event: 'MessageFromPeer',
-                            data: {
-                                message,
-                                peerId
-                            }
-                        });
                 }
+                setEvent({
+                    event: 'MessageFromPeer',
+                    data: {
+                        message,
+                        peerId
+                    }
+                });
             });
 
             rtmClient.on('ConnectionStateChanged', (newState, reason) => {
